@@ -325,74 +325,98 @@ const App: React.FC = () => {
           </div>
         )}
 
-        {/* ==================== CONTAS A PAGAR (BOLETOS) ==================== */}
-        {view === 'boletos' && (
-          <div className="space-y-10 animate-in fade-in duration-500">
-            <header className="flex justify-between items-center">
-              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Contas a Pagar</h2>
-            </header>
-            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
-              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Novo Boleto</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <input id="boleto-desc" type="text" placeholder="Descrição (ex: Conta de luz)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
-                <input id="boleto-value" type="number" placeholder="Valor (R$)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
-                <input id="boleto-due" type="date" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
-                <select id="boleto-cat" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
-                  <option value="">Categoria...</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                </select>
-              </div>
-              <button onClick={() => {
-                const desc = (document.getElementById('boleto-desc') as HTMLInputElement).value;
-                const val = parseFloat((document.getElementById('boleto-value') as HTMLInputElement).value);
-                const due = (document.getElementById('boleto-due') as HTMLInputElement).value;
-                const cat = (document.getElementById('boleto-cat') as HTMLSelectElement).value;
-                if (!desc || !val || !due) return;
-                setBoletos(prev => [{ id: Date.now().toString(), description: desc, value: val, dueDate: due, status: 'pending', categoryId: cat }, ...prev]);
-                (document.getElementById('boleto-desc') as HTMLInputElement).value = '';
-                (document.getElementById('boleto-value') as HTMLInputElement).value = '';
-                (document.getElementById('boleto-due') as HTMLInputElement).value = '';
-              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Adicionar Boleto</button>
-            </div>
+        {/* ==================== CONTAS A PAGAR - PREVISÃO MÊS SEGUINTE ==================== */}
+        {view === 'boletos' && (() => {
+          const now = new Date();
+          const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+          const nextMonthName = nextMonth.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }).toUpperCase();
+          const nextMonthNum = nextMonth.getMonth();
+          const nextMonthYear = nextMonth.getFullYear();
+          const boletosNextMonth = boletos.filter(b => { const d = new Date(b.dueDate); return d.getMonth() === nextMonthNum && d.getFullYear() === nextMonthYear; });
+          const totalPending = boletosNextMonth.filter(b => b.status === 'pending').reduce((a, x) => a + x.value, 0);
+          const totalPaid = boletosNextMonth.filter(b => b.status === 'paid').reduce((a, x) => a + x.value, 0);
+          const defaultDue = `${nextMonthYear}-${String(nextMonthNum + 1).padStart(2, '0')}-01`;
+          return (
+            <div className="space-y-10 animate-in fade-in duration-500">
+              <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                  <h2 className="text-3xl font-black text-slate-800 tracking-tight">Contas a Pagar</h2>
+                  <p className="text-sm font-bold text-slate-400 mt-1 flex items-center gap-2"><Calendar size={14} /> Previsão para <span className="text-emerald-600 font-black ml-1">{nextMonthName}</span></p>
+                </div>
+              </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-red-600 p-10 rounded-[48px] shadow-2xl text-white">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">Total Pendente</p>
-                <p className="text-5xl font-black mt-3">R$ {boletos.filter(b => b.status === 'pending').reduce((a, b2) => a + b2.value, 0).toLocaleString('pt-BR')}</p>
-                <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletos.filter(b => b.status === 'pending').length} pendentes</span>
+              <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Lançar Vencimento — {nextMonthName}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  <input id="boleto-desc" type="text" placeholder="Descrição (ex: AMBEV, GAS, LUZ)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                  <input id="boleto-value" type="number" placeholder="Valor (R$)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                  <input id="boleto-due" type="date" defaultValue={defaultDue} className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                  <select id="boleto-cat" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
+                    <option value="">Fornecedor...</option>
+                    {suppliers.sort((a, b) => a.name.localeCompare(b.name)).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+                <button onClick={() => {
+                  const desc = (document.getElementById('boleto-desc') as HTMLInputElement).value;
+                  const val = parseFloat((document.getElementById('boleto-value') as HTMLInputElement).value);
+                  const due = (document.getElementById('boleto-due') as HTMLInputElement).value;
+                  const cat = (document.getElementById('boleto-cat') as HTMLSelectElement).value;
+                  if (!desc || !val || !due) return;
+                  setBoletos(prev => [{ id: Date.now().toString(), description: desc, value: val, dueDate: due, status: 'pending', categoryId: cat }, ...prev]);
+                  (document.getElementById('boleto-desc') as HTMLInputElement).value = '';
+                  (document.getElementById('boleto-value') as HTMLInputElement).value = '';
+                }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Lançar Conta</button>
               </div>
-              <div className="bg-emerald-600 p-10 rounded-[48px] shadow-2xl text-white">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">Total Pago</p>
-                <p className="text-5xl font-black mt-3">R$ {boletos.filter(b => b.status === 'paid').reduce((a, b2) => a + b2.value, 0).toLocaleString('pt-BR')}</p>
-                <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletos.filter(b => b.status === 'paid').length} pagos</span>
-              </div>
-            </div>
 
-            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
-                  <tr><th className="p-6">Descrição</th><th className="p-6">Vencimento</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Ações</th></tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {boletos.sort((a, b2) => new Date(a.dueDate).getTime() - new Date(b2.dueDate).getTime()).map(b => (
-                    <tr key={b.id} className="hover:bg-slate-50">
-                      <td className="p-6 font-black text-slate-700">{b.description}</td>
-                      <td className="p-6 font-bold">{new Date(b.dueDate).toLocaleDateString()}</td>
-                      <td className="p-6 text-right font-black text-emerald-600">R$ {b.value.toLocaleString('pt-BR')}</td>
-                      <td className="p-6 text-center">
-                        <button onClick={() => setBoletos(prev => prev.map(x => x.id === b.id ? { ...x, status: x.status === 'pending' ? 'paid' : 'pending' } : x))}
-                          className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${b.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                          {b.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}
-                        </button>
-                      </td>
-                      <td className="p-6 text-center"><button onClick={() => setBoletos(prev => prev.filter(x => x.id !== b.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-slate-900 p-10 rounded-[48px] shadow-2xl text-white">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">Total Previsto</p>
+                  <p className="text-4xl font-black text-white mt-3">R$ {(totalPending + totalPaid).toLocaleString('pt-BR')}</p>
+                  <span className="inline-block mt-6 px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase">{boletosNextMonth.length} lançamentos</span>
+                </div>
+                <div className="bg-red-600 p-10 rounded-[48px] shadow-2xl text-white">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">A Pagar</p>
+                  <p className="text-4xl font-black mt-3">R$ {totalPending.toLocaleString('pt-BR')}</p>
+                  <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletosNextMonth.filter(b => b.status === 'pending').length} pendentes</span>
+                </div>
+                <div className="bg-emerald-600 p-10 rounded-[48px] shadow-2xl text-white">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">Já Pago</p>
+                  <p className="text-4xl font-black mt-3">R$ {totalPaid.toLocaleString('pt-BR')}</p>
+                  <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletosNextMonth.filter(b => b.status === 'paid').length} pagos</span>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+                <div className="p-6 bg-slate-50 border-b"><p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><AlertCircle size={14} /> Vencimentos de {nextMonthName}</p></div>
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50/50 border-b text-[10px] font-black uppercase text-slate-400">
+                    <tr><th className="p-6">Descrição</th><th className="p-6">Fornecedor</th><th className="p-6">Vencimento</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Ação</th></tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {boletosNextMonth.sort((a, x) => new Date(a.dueDate).getTime() - new Date(x.dueDate).getTime()).map(b => (
+                      <tr key={b.id} className="hover:bg-slate-50">
+                        <td className="p-6 font-black text-slate-700">{b.description}</td>
+                        <td className="p-6 text-slate-600">{suppliers.find(s => s.id === b.categoryId)?.name || '—'}</td>
+                        <td className="p-6 font-bold">{new Date(b.dueDate).toLocaleDateString()}</td>
+                        <td className="p-6 text-right font-black text-emerald-600">R$ {b.value.toLocaleString('pt-BR')}</td>
+                        <td className="p-6 text-center">
+                          <button onClick={() => setBoletos(prev => prev.map(x => x.id === b.id ? { ...x, status: x.status === 'pending' ? 'paid' : 'pending' } : x))}
+                            className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${b.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                            {b.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}
+                          </button>
+                        </td>
+                        <td className="p-6 text-center"><button onClick={() => setBoletos(prev => prev.filter(x => x.id !== b.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                      </tr>
+                    ))}
+                    {boletosNextMonth.length === 0 && (
+                      <tr><td colSpan={6} className="p-10 text-center text-slate-400 font-bold">Nenhum vencimento lançado para {nextMonthName}</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* ==================== PRODUTOS ==================== */}
         {view === 'products' && (
