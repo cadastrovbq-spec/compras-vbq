@@ -1,0 +1,8 @@
+
+{
+  "name": "COMPRAS VBQ - PHP System",
+  "description": "Versão profissional em PHP para gestão de notas e estoque.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
