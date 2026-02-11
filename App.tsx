@@ -22,12 +22,14 @@ import {
   AlertCircle,
   Calculator,
   Calendar,
-  FilterX
+  FilterX,
+  Menu
 } from 'lucide-react';
 import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto } from './types';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('dashboard');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const loadFromLS = <T,>(key: string, defaultValue: T): T => {
     try {
@@ -106,15 +108,30 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 relative font-sans">
-      <aside className="w-full md:w-72 bg-slate-900 text-white flex flex-col h-screen sticky top-0 z-50 shadow-2xl overflow-y-auto no-print">
-        <div className="p-10 flex items-center gap-3">
+      {/* MOBILE HEADER */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white flex items-center justify-between px-5 py-3 shadow-xl no-print">
+        <div className="flex items-center gap-3">
+          <div className="p-1.5 bg-emerald-500 rounded-xl"><Package size={20} /></div>
+          <h1 className="text-base font-black tracking-tighter uppercase">COMPRAS VBQ</h1>
+        </div>
+        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-xl hover:bg-slate-800 transition-colors">
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* MOBILE MENU OVERLAY */}
+      {mobileMenuOpen && <div className="md:hidden fixed inset-0 bg-black/50 z-[55]" onClick={() => setMobileMenuOpen(false)} />}
+
+      {/* SIDEBAR */}
+      <aside className={`fixed md:sticky top-0 left-0 h-screen z-[58] w-72 bg-slate-900 text-white flex flex-col shadow-2xl overflow-y-auto no-print transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+        <div className="p-10 flex items-center gap-3 hidden md:flex">
           <div className="p-2.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20"><Package size={28} /></div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">COMPRAS VBQ</h1>
             <p className="text-[10px] font-bold text-slate-500 tracking-widest mt-1">VERCEL DEPLOY</p>
           </div>
         </div>
-        <nav className="flex-1 px-5 space-y-1.5 pb-10">
+        <nav className="flex-1 px-5 space-y-1.5 pb-10 pt-16 md:pt-0">
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Painel Geral' },
             { id: 'receipts', icon: ListPlus, label: 'Lançar Notas' },
@@ -125,14 +142,14 @@ const App: React.FC = () => {
             { id: 'sales', icon: ShoppingCart, label: 'Caixa do Dia' },
             { id: 'reports', icon: BarChart3, label: 'Análise de Itens' }
           ].map(item => (
-            <button key={item.id} onClick={() => setView(item.id as ViewType)} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button key={item.id} onClick={() => { setView(item.id as ViewType); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <item.icon size={20} /> {item.label}
             </button>
           ))}
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto max-w-7xl mx-auto w-full">
+      <main className="flex-1 p-4 pt-20 md:pt-12 md:p-12 overflow-y-auto max-w-7xl mx-auto w-full">
         {view === 'dashboard' && (
           <div className="space-y-10 animate-in fade-in duration-500">
             <header><h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Controle</h2></header>
@@ -304,8 +321,8 @@ const App: React.FC = () => {
         {view === 'notas_lancadas' && (
           <div className="space-y-10 animate-in fade-in duration-500">
             <header className="flex justify-between items-center"><h2 className="text-3xl font-black text-slate-800 tracking-tight">Histórico de Notas</h2></header>
-            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-              <table className="w-full text-left">
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
                 <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
                   <tr><th className="p-8">Data</th><th className="p-8">Fornecedor</th><th className="p-8">Produto</th><th className="p-8 text-right">Total</th><th className="p-8 text-center">Ação</th></tr>
                 </thead>
@@ -386,9 +403,9 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+              <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
                 <div className="p-6 bg-slate-50 border-b"><p className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><AlertCircle size={14} /> Vencimentos de {nextMonthName}</p></div>
-                <table className="w-full text-left">
+                <table className="w-full text-left min-w-[700px]">
                   <thead className="bg-slate-50/50 border-b text-[10px] font-black uppercase text-slate-400">
                     <tr><th className="p-6">Descrição</th><th className="p-6">Fornecedor</th><th className="p-6">Vencimento</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Ação</th></tr>
                   </thead>
@@ -458,8 +475,8 @@ const App: React.FC = () => {
               }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Cadastrar Produto</button>
             </div>
 
-            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-              <table className="w-full text-left">
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+              <table className="w-full text-left min-w-[600px]">
                 <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
                   <tr><th className="p-6">Produto</th><th className="p-6">SKU</th><th className="p-6">Categoria</th><th className="p-6">Unidade</th><th className="p-6 text-center">Ação</th></tr>
                 </thead>
@@ -511,8 +528,8 @@ const App: React.FC = () => {
               }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Cadastrar Fornecedor</button>
             </div>
 
-            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-              <table className="w-full text-left">
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+              <table className="w-full text-left min-w-[700px]">
                 <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
                   <tr><th className="p-6">Empresa</th><th className="p-6">CNPJ</th><th className="p-6">Telefone</th><th className="p-6">Vendedor</th><th className="p-6">Tel. Vendedor</th><th className="p-6 text-center">Ação</th></tr>
                 </thead>
@@ -576,8 +593,8 @@ const App: React.FC = () => {
               </div>
 
               <div className="lg:col-span-7">
-                <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-                  <table className="w-full text-left">
+                <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+                  <table className="w-full text-left min-w-[500px]">
                     <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
                       <tr><th className="p-6">Data</th><th className="p-6 text-right">Valor</th><th className="p-6">Obs</th><th className="p-6 text-center">Ação</th></tr>
                     </thead>
