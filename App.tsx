@@ -1,10 +1,10 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Plus, 
-  Trash2, 
+import {
+  LayoutDashboard,
+  Package,
+  Plus,
+  Trash2,
   TrendingUp,
   ShoppingCart,
   CreditCard,
@@ -28,7 +28,7 @@ import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto } fro
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('dashboard');
-  
+
   const loadFromLS = <T,>(key: string, defaultValue: T): T => {
     try {
       const saved = localStorage.getItem(key);
@@ -108,7 +108,7 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 relative font-sans">
       <aside className="w-full md:w-72 bg-slate-900 text-white flex flex-col h-screen sticky top-0 z-50 shadow-2xl overflow-y-auto no-print">
         <div className="p-10 flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20"><Package size={28}/></div>
+          <div className="p-2.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20"><Package size={28} /></div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">COMPRAS VBQ</h1>
             <p className="text-[10px] font-bold text-slate-500 tracking-widest mt-1">VERCEL DEPLOY</p>
@@ -166,32 +166,32 @@ const App: React.FC = () => {
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <h2 className="text-3xl font-black text-slate-800 tracking-tight">Análise Avançada de Consumo</h2>
               <div className="flex gap-2">
-                <button onClick={() => { setReportFilterProduct(''); setReportFilterSupplier(''); setReportFilterStartDate(''); setReportFilterEndDate(''); }} className="p-3 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-all flex items-center gap-2 font-bold text-xs uppercase"><FilterX size={16}/> Limpar Filtros</button>
-                <button onClick={() => window.print()} className="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all flex items-center gap-2 font-bold text-xs uppercase"><Printer size={16}/> Imprimir</button>
+                <button onClick={() => { setReportFilterProduct(''); setReportFilterSupplier(''); setReportFilterStartDate(''); setReportFilterEndDate(''); }} className="p-3 bg-slate-200 text-slate-600 rounded-xl hover:bg-slate-300 transition-all flex items-center gap-2 font-bold text-xs uppercase"><FilterX size={16} /> Limpar Filtros</button>
+                <button onClick={() => window.print()} className="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all flex items-center gap-2 font-bold text-xs uppercase"><Printer size={16} /> Imprimir</button>
               </div>
             </header>
 
             <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 no-print">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Users size={12}/> Cliente / Fornecedor</label>
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Users size={12} /> Cliente / Fornecedor</label>
                 <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none" value={reportFilterSupplier} onChange={e => setReportFilterSupplier(e.target.value)}>
                   <option value="">Todos</option>
                   {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Box size={12}/> Produto</label>
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Box size={12} /> Produto</label>
                 <select className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold text-slate-700 outline-none" value={reportFilterProduct} onChange={e => setReportFilterProduct(e.target.value)}>
                   <option value="">Todos</option>
                   {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Calendar size={12}/> Início</label>
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Calendar size={12} /> Início</label>
                 <input type="date" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold" value={reportFilterStartDate} onChange={e => setReportFilterStartDate(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Calendar size={12}/> Fim</label>
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 flex items-center gap-1.5"><Calendar size={12} /> Fim</label>
                 <input type="date" className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl font-bold" value={reportFilterEndDate} onChange={e => setReportFilterEndDate(e.target.value)} />
               </div>
             </div>
@@ -203,7 +203,7 @@ const App: React.FC = () => {
                 <div className="mt-8"><span className="px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{filteredReceiptsForReport.length} Lançamentos</span></div>
               </div>
               <div className="lg:col-span-2 bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm overflow-y-auto max-h-[350px]">
-                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2"><History size={16}/> Histórico Filtrado</h3>
+                <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2"><History size={16} /> Histórico Filtrado</h3>
                 <div className="space-y-3">
                   {filteredReceiptsForReport.map((r, i) => (
                     <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-2xl group hover:bg-emerald-50 transition-colors">
@@ -232,48 +232,48 @@ const App: React.FC = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="md:col-span-2 space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Fornecedor</label>
-                      <select className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all" value={draftInvoiceHeader.supplierId} onChange={e => setDraftInvoiceHeader({...draftInvoiceHeader, supplierId: e.target.value})}>
+                      <select className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-indigo-500 transition-all" value={draftInvoiceHeader.supplierId} onChange={e => setDraftInvoiceHeader({ ...draftInvoiceHeader, supplierId: e.target.value })}>
                         <option value="">Selecione...</option>
-                        {suppliers.sort((a,b) => a.name.localeCompare(b.name)).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        {suppliers.sort((a, b) => a.name.localeCompare(b.name)).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                       </select>
                     </div>
                     <div className="space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Nº Nota</label>
-                      <input className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-black" value={draftInvoiceHeader.invoiceNumber} onChange={e => setDraftInvoiceHeader({...draftInvoiceHeader, invoiceNumber: e.target.value})} />
+                      <input className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-black" value={draftInvoiceHeader.invoiceNumber} onChange={e => setDraftInvoiceHeader({ ...draftInvoiceHeader, invoiceNumber: e.target.value })} />
                     </div>
                     <div className="space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Data</label>
-                      <input type="date" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-black" value={draftInvoiceHeader.date} onChange={e => setDraftInvoiceHeader({...draftInvoiceHeader, date: e.target.value})} />
+                      <input type="date" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-black" value={draftInvoiceHeader.date} onChange={e => setDraftInvoiceHeader({ ...draftInvoiceHeader, date: e.target.value })} />
                     </div>
                   </div>
                 </section>
                 <section className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-3 relative">
-                        <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Produto</label>
-                        <input className="w-full p-5 pl-6 bg-slate-50 border-2 border-transparent rounded-[28px] font-black outline-none focus:border-emerald-500" placeholder="Buscar no catálogo..." value={currentProductSearch} onFocus={() => setIsProductListOpen(true)} onChange={e => { setCurrentProductSearch(e.target.value); setIsProductListOpen(true); }} />
-                        {isProductListOpen && (
-                          <div className="absolute top-full left-0 w-full mt-2 bg-white border rounded-[28px] shadow-2xl z-[100] max-h-60 overflow-y-auto">
-                            {products.filter(p => p.name.toLowerCase().includes(currentProductSearch.toLowerCase())).slice(0, 20).map(p => (
-                              <button key={p.id} className="w-full p-5 text-left hover:bg-emerald-50 border-b flex justify-between" onClick={() => { setCurrentItemForm({...currentItemForm, productId: p.id}); setCurrentProductSearch(p.name); setIsProductListOpen(false); }}>
-                                <span className="font-bold">{p.name}</span>
-                                <span className="text-xs text-slate-400 uppercase">{p.unit}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <input type="number" placeholder="Valor Unit." className="w-full p-5 bg-emerald-50/50 rounded-[28px] font-black text-center outline-none" value={currentItemForm.unitPrice} onChange={e => setCurrentItemForm({...currentItemForm, unitPrice: e.target.value})} />
-                        <input type="number" placeholder="Qtd" className="w-full p-5 bg-slate-50 rounded-[28px] font-black text-center outline-none" value={currentItemForm.quantity} onChange={e => setCurrentItemForm({...currentItemForm, quantity: e.target.value})} />
-                      </div>
-                   </div>
-                   <button onClick={() => {
-                     if (!currentItemForm.productId || !currentItemForm.quantity || !currentItemForm.unitPrice) return;
-                     setDraftItems(prev => [{ productId: currentItemForm.productId, quantity: parseFloat(currentItemForm.quantity), unitPrice: parseFloat(currentItemForm.unitPrice) }, ...prev]);
-                     setCurrentItemForm({ productId: '', quantity: '', unitPrice: '' });
-                     setCurrentProductSearch('');
-                   }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Adicionar Item</button>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3 relative">
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Produto</label>
+                      <input className="w-full p-5 pl-6 bg-slate-50 border-2 border-transparent rounded-[28px] font-black outline-none focus:border-emerald-500" placeholder="Buscar no catálogo..." value={currentProductSearch} onFocus={() => setIsProductListOpen(true)} onChange={e => { setCurrentProductSearch(e.target.value); setIsProductListOpen(true); }} />
+                      {isProductListOpen && (
+                        <div className="absolute top-full left-0 w-full mt-2 bg-white border rounded-[28px] shadow-2xl z-[100] max-h-60 overflow-y-auto">
+                          {products.filter(p => p.name.toLowerCase().includes(currentProductSearch.toLowerCase())).slice(0, 20).map(p => (
+                            <button key={p.id} className="w-full p-5 text-left hover:bg-emerald-50 border-b flex justify-between" onClick={() => { setCurrentItemForm({ ...currentItemForm, productId: p.id }); setCurrentProductSearch(p.name); setIsProductListOpen(false); }}>
+                              <span className="font-bold">{p.name}</span>
+                              <span className="text-xs text-slate-400 uppercase">{p.unit}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <input type="number" placeholder="Valor Unit." className="w-full p-5 bg-emerald-50/50 rounded-[28px] font-black text-center outline-none" value={currentItemForm.unitPrice} onChange={e => setCurrentItemForm({ ...currentItemForm, unitPrice: e.target.value })} />
+                      <input type="number" placeholder="Qtd" className="w-full p-5 bg-slate-50 rounded-[28px] font-black text-center outline-none" value={currentItemForm.quantity} onChange={e => setCurrentItemForm({ ...currentItemForm, quantity: e.target.value })} />
+                    </div>
+                  </div>
+                  <button onClick={() => {
+                    if (!currentItemForm.productId || !currentItemForm.quantity || !currentItemForm.unitPrice) return;
+                    setDraftItems(prev => [{ productId: currentItemForm.productId, quantity: parseFloat(currentItemForm.quantity), unitPrice: parseFloat(currentItemForm.unitPrice) }, ...prev]);
+                    setCurrentItemForm({ productId: '', quantity: '', unitPrice: '' });
+                    setCurrentProductSearch('');
+                  }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Adicionar Item</button>
                 </section>
               </div>
               <div className="lg:col-span-5 space-y-10">
@@ -288,39 +288,290 @@ const App: React.FC = () => {
                   }} className="w-full mt-10 py-6 bg-white text-slate-900 rounded-[32px] font-black uppercase shadow-xl hover:bg-emerald-50">Finalizar Nota</button>}
                 </section>
                 <section className="bg-white rounded-[48px] border border-slate-200 shadow-xl p-8 max-h-[400px] overflow-y-auto space-y-4">
-                   {draftItems.map((item, i) => (
-                     <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-[24px]">
-                       <div><p className="font-bold">{products.find(p => p.id === item.productId)?.name}</p><p className="text-xs text-slate-400">{item.quantity} x R$ {item.unitPrice}</p></div>
-                       <button onClick={() => setDraftItems(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400"><Trash2 size={16}/></button>
-                     </div>
-                   ))}
+                  {draftItems.map((item, i) => (
+                    <div key={i} className="flex justify-between items-center p-4 bg-slate-50 rounded-[24px]">
+                      <div><p className="font-bold">{products.find(p => p.id === item.productId)?.name}</p><p className="text-xs text-slate-400">{item.quantity} x R$ {item.unitPrice}</p></div>
+                      <button onClick={() => setDraftItems(prev => prev.filter((_, idx) => idx !== i))} className="text-red-400"><Trash2 size={16} /></button>
+                    </div>
+                  ))}
                 </section>
               </div>
             </div>
           </div>
         )}
 
-        {/* MANTENDO AS OUTRAS TELAS SIMPLIFICADAS PARA ESPAÇO */}
+        {/* ==================== HISTÓRICO DE NOTAS ==================== */}
         {view === 'notas_lancadas' && (
-           <div className="space-y-10 animate-in fade-in duration-500">
-             <header className="flex justify-between items-center"><h2 className="text-3xl font-black text-slate-800 tracking-tight">Histórico de Notas</h2></header>
-             <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
-                <table className="w-full text-left">
-                  <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
-                    <tr><th className="p-8">Data</th><th className="p-8">Fornecedor</th><th className="p-8 text-right">Total</th></tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {receipts.slice(0, 50).map(r => (
-                      <tr key={r.id} className="hover:bg-slate-50">
-                        <td className="p-8 font-bold">{new Date(r.date).toLocaleDateString()}</td>
-                        <td className="p-8 font-black text-slate-700">{suppliers.find(s => s.id === r.supplierId)?.name}</td>
-                        <td className="p-8 text-right font-black text-emerald-600">R$ {r.totalValue.toLocaleString('pt-BR')}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-             </div>
-           </div>
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="flex justify-between items-center"><h2 className="text-3xl font-black text-slate-800 tracking-tight">Histórico de Notas</h2></header>
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-8">Data</th><th className="p-8">Fornecedor</th><th className="p-8">Produto</th><th className="p-8 text-right">Total</th><th className="p-8 text-center">Ação</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {receipts.slice(0, 50).map(r => (
+                    <tr key={r.id} className="hover:bg-slate-50">
+                      <td className="p-8 font-bold">{new Date(r.date).toLocaleDateString()}</td>
+                      <td className="p-8 font-black text-slate-700">{suppliers.find(s => s.id === r.supplierId)?.name}</td>
+                      <td className="p-8 text-slate-600">{products.find(p => p.id === r.productId)?.name}</td>
+                      <td className="p-8 text-right font-black text-emerald-600">R$ {r.totalValue.toLocaleString('pt-BR')}</td>
+                      <td className="p-8 text-center"><button onClick={() => setReceipts(prev => prev.filter(x => x.id !== r.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== CONTAS A PAGAR (BOLETOS) ==================== */}
+        {view === 'boletos' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="flex justify-between items-center">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Contas a Pagar</h2>
+            </header>
+            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Novo Boleto</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <input id="boleto-desc" type="text" placeholder="Descrição (ex: Conta de luz)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="boleto-value" type="number" placeholder="Valor (R$)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="boleto-due" type="date" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <select id="boleto-cat" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
+                  <option value="">Categoria...</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <button onClick={() => {
+                const desc = (document.getElementById('boleto-desc') as HTMLInputElement).value;
+                const val = parseFloat((document.getElementById('boleto-value') as HTMLInputElement).value);
+                const due = (document.getElementById('boleto-due') as HTMLInputElement).value;
+                const cat = (document.getElementById('boleto-cat') as HTMLSelectElement).value;
+                if (!desc || !val || !due) return;
+                setBoletos(prev => [{ id: Date.now().toString(), description: desc, value: val, dueDate: due, status: 'pending', categoryId: cat }, ...prev]);
+                (document.getElementById('boleto-desc') as HTMLInputElement).value = '';
+                (document.getElementById('boleto-value') as HTMLInputElement).value = '';
+                (document.getElementById('boleto-due') as HTMLInputElement).value = '';
+              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Adicionar Boleto</button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="bg-red-600 p-10 rounded-[48px] shadow-2xl text-white">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">Total Pendente</p>
+                <p className="text-5xl font-black mt-3">R$ {boletos.filter(b => b.status === 'pending').reduce((a, b2) => a + b2.value, 0).toLocaleString('pt-BR')}</p>
+                <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletos.filter(b => b.status === 'pending').length} pendentes</span>
+              </div>
+              <div className="bg-emerald-600 p-10 rounded-[48px] shadow-2xl text-white">
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] opacity-70">Total Pago</p>
+                <p className="text-5xl font-black mt-3">R$ {boletos.filter(b => b.status === 'paid').reduce((a, b2) => a + b2.value, 0).toLocaleString('pt-BR')}</p>
+                <span className="inline-block mt-6 px-3 py-1 bg-white/20 rounded-lg text-[10px] font-black uppercase">{boletos.filter(b => b.status === 'paid').length} pagos</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-6">Descrição</th><th className="p-6">Vencimento</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Ações</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {boletos.sort((a, b2) => new Date(a.dueDate).getTime() - new Date(b2.dueDate).getTime()).map(b => (
+                    <tr key={b.id} className="hover:bg-slate-50">
+                      <td className="p-6 font-black text-slate-700">{b.description}</td>
+                      <td className="p-6 font-bold">{new Date(b.dueDate).toLocaleDateString()}</td>
+                      <td className="p-6 text-right font-black text-emerald-600">R$ {b.value.toLocaleString('pt-BR')}</td>
+                      <td className="p-6 text-center">
+                        <button onClick={() => setBoletos(prev => prev.map(x => x.id === b.id ? { ...x, status: x.status === 'pending' ? 'paid' : 'pending' } : x))}
+                          className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${b.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                          {b.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}
+                        </button>
+                      </td>
+                      <td className="p-6 text-center"><button onClick={() => setBoletos(prev => prev.filter(x => x.id !== b.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== PRODUTOS ==================== */}
+        {view === 'products' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="flex justify-between items-center">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Produtos</h2>
+              <span className="px-4 py-2 bg-slate-100 rounded-full text-xs font-black text-slate-500 uppercase">{products.length} cadastrados</span>
+            </header>
+            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Novo Produto</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <input id="prod-name" type="text" placeholder="Nome do Produto" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="prod-sku" type="text" placeholder="SKU / Código" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <select id="prod-cat" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
+                  <option value="">Categoria...</option>
+                  {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+                <select id="prod-unit" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
+                  <option value="">Unidade...</option>
+                  <option value="KG">KG</option>
+                  <option value="UN">UN</option>
+                  <option value="L">L</option>
+                  <option value="CX">CX</option>
+                  <option value="FD">FARDO</option>
+                  <option value="PCT">PACOTE</option>
+                  <option value="GL">GALÃO</option>
+                  <option value="BD">BALDE</option>
+                </select>
+              </div>
+              <button onClick={() => {
+                const name = (document.getElementById('prod-name') as HTMLInputElement).value;
+                const sku = (document.getElementById('prod-sku') as HTMLInputElement).value;
+                const cat = (document.getElementById('prod-cat') as HTMLSelectElement).value;
+                const unit = (document.getElementById('prod-unit') as HTMLSelectElement).value;
+                if (!name || !unit) return;
+                setProducts(prev => [{ id: Date.now().toString(), name: name.toUpperCase(), sku, categoryId: cat, unit }, ...prev]);
+                (document.getElementById('prod-name') as HTMLInputElement).value = '';
+                (document.getElementById('prod-sku') as HTMLInputElement).value = '';
+              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Cadastrar Produto</button>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-6">Produto</th><th className="p-6">SKU</th><th className="p-6">Categoria</th><th className="p-6">Unidade</th><th className="p-6 text-center">Ação</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {products.map(p => (
+                    <tr key={p.id} className="hover:bg-slate-50">
+                      <td className="p-6 font-black text-slate-700">{p.name}</td>
+                      <td className="p-6 font-mono text-slate-500">{p.sku || '—'}</td>
+                      <td className="p-6"><span className="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-[10px] font-black uppercase">{categories.find(c => c.id === p.categoryId)?.name || '—'}</span></td>
+                      <td className="p-6 font-bold text-slate-600">{p.unit}</td>
+                      <td className="p-6 text-center"><button onClick={() => setProducts(prev => prev.filter(x => x.id !== p.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== FORNECEDORES ==================== */}
+        {view === 'suppliers' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="flex justify-between items-center">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Fornecedores</h2>
+              <span className="px-4 py-2 bg-slate-100 rounded-full text-xs font-black text-slate-500 uppercase">{suppliers.length} cadastrados</span>
+            </header>
+            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Novo Fornecedor</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <input id="sup-name" type="text" placeholder="Nome da Empresa" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="sup-cnpj" type="text" placeholder="CNPJ" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="sup-contact" type="text" placeholder="Telefone" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="sup-vendor" type="text" placeholder="Nome do Vendedor" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="sup-vphone" type="text" placeholder="Telefone do Vendedor" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+              </div>
+              <button onClick={() => {
+                const name = (document.getElementById('sup-name') as HTMLInputElement).value;
+                const cnpj = (document.getElementById('sup-cnpj') as HTMLInputElement).value;
+                const contact = (document.getElementById('sup-contact') as HTMLInputElement).value;
+                const vendor = (document.getElementById('sup-vendor') as HTMLInputElement).value;
+                const vphone = (document.getElementById('sup-vphone') as HTMLInputElement).value;
+                if (!name) return;
+                setSuppliers(prev => [{ id: Date.now().toString(), name: name.toUpperCase(), taxId: cnpj, contact, vendorName: vendor, vendorPhone: vphone }, ...prev]);
+                (document.getElementById('sup-name') as HTMLInputElement).value = '';
+                (document.getElementById('sup-cnpj') as HTMLInputElement).value = '';
+                (document.getElementById('sup-contact') as HTMLInputElement).value = '';
+                (document.getElementById('sup-vendor') as HTMLInputElement).value = '';
+                (document.getElementById('sup-vphone') as HTMLInputElement).value = '';
+              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Cadastrar Fornecedor</button>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+              <table className="w-full text-left">
+                <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-6">Empresa</th><th className="p-6">CNPJ</th><th className="p-6">Telefone</th><th className="p-6">Vendedor</th><th className="p-6">Tel. Vendedor</th><th className="p-6 text-center">Ação</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {suppliers.sort((a, b) => a.name.localeCompare(b.name)).map(s => (
+                    <tr key={s.id} className="hover:bg-slate-50">
+                      <td className="p-6 font-black text-slate-700">{s.name}</td>
+                      <td className="p-6 font-mono text-slate-500">{s.taxId || '—'}</td>
+                      <td className="p-6 text-slate-600">{s.contact || '—'}</td>
+                      <td className="p-6 text-slate-600">{s.vendorName || '—'}</td>
+                      <td className="p-6 text-slate-600">{s.vendorPhone || '—'}</td>
+                      <td className="p-6 text-center"><button onClick={() => setSuppliers(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== CAIXA DO DIA ==================== */}
+        {view === 'sales' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header className="flex justify-between items-center">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Caixa do Dia</h2>
+            </header>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+              <div className="lg:col-span-5 space-y-10">
+                <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Registrar Venda do Dia</h3>
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Data</label>
+                      <input id="sale-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Valor Total do Dia (R$)</label>
+                      <input id="sale-value" type="number" placeholder="0,00" className="w-full p-5 bg-emerald-50 border-2 border-transparent rounded-[28px] font-black text-3xl text-center outline-none focus:border-emerald-500" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Observações</label>
+                      <input id="sale-notes" type="text" placeholder="Ex: Dia fraco, choveu..." className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                    </div>
+                  </div>
+                  <button onClick={() => {
+                    const date = (document.getElementById('sale-date') as HTMLInputElement).value;
+                    const val = parseFloat((document.getElementById('sale-value') as HTMLInputElement).value);
+                    const notes = (document.getElementById('sale-notes') as HTMLInputElement).value;
+                    if (!val || !date) return;
+                    setDailySales(prev => [{ id: Date.now().toString(), totalValue: val, date, notes }, ...prev]);
+                    (document.getElementById('sale-value') as HTMLInputElement).value = '';
+                    (document.getElementById('sale-notes') as HTMLInputElement).value = '';
+                  }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Registrar Caixa</button>
+                </div>
+
+                <div className="bg-indigo-900 p-10 rounded-[48px] shadow-2xl text-white">
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Faturamento do Mês</p>
+                  <p className="text-5xl font-black text-emerald-400 mt-3">R$ {dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).reduce((a, s) => a + s.totalValue, 0).toLocaleString('pt-BR')}</p>
+                  <span className="inline-block mt-6 px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase">{dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).length} dias registrados</span>
+                </div>
+              </div>
+
+              <div className="lg:col-span-7">
+                <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm">
+                  <table className="w-full text-left">
+                    <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                      <tr><th className="p-6">Data</th><th className="p-6 text-right">Valor</th><th className="p-6">Obs</th><th className="p-6 text-center">Ação</th></tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {dailySales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(s => (
+                        <tr key={s.id} className="hover:bg-slate-50">
+                          <td className="p-6 font-bold">{new Date(s.date).toLocaleDateString()}</td>
+                          <td className="p-6 text-right font-black text-emerald-600">R$ {s.totalValue.toLocaleString('pt-BR')}</td>
+                          <td className="p-6 text-slate-500 text-sm">{s.notes || '—'}</td>
+                          <td className="p-6 text-center"><button onClick={() => setDailySales(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </main>
     </div>
