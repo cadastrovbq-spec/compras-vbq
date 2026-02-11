@@ -6,33 +6,100 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
+/* === MOBILE RESPONSIVE === */
+@media (max-width: 768px) {
+  .rounded-\[48px\] {
+    border-radius: 24px !important;
+  }
+
+  .rounded-\[40px\] {
+    border-radius: 20px !important;
+  }
+
+  .rounded-\[28px\] {
+    border-radius: 16px !important;
+  }
+
+  .p-10 {
+    padding: 1.25rem !important;
+  }
+
+  .p-8 {
+    padding: 1rem !important;
+  }
+
+  .text-5xl {
+    font-size: 2rem !important;
+  }
+
+  .text-4xl {
+    font-size: 1.5rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.25rem !important;
+  }
+
+  .text-6xl {
+    font-size: 2.25rem !important;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem 0.5rem !important;
+    white-space: nowrap;
+  }
+
+  input,
+  select,
+  button {
+    min-height: 44px;
+  }
+}
+
 @media print {
-  aside, .no-print, button, .modal-backdrop {
+
+  aside,
+  .no-print,
+  button,
+  .modal-backdrop {
     display: none !important;
   }
+
   main {
     margin: 0 !important;
     padding: 0 !important;
     width: 100% !important;
     max-width: none !important;
   }
+
   .print-container {
     padding: 20px !important;
   }
+
   table {
     width: 100% !important;
     border-collapse: collapse !important;
   }
-  th, td {
+
+  th,
+  td {
     border: 1px solid #e2e8f0 !important;
     padding: 8px !important;
     font-size: 10pt !important;
   }
-  .bg-indigo-900, .bg-slate-900 {
+
+  .bg-indigo-900,
+  .bg-slate-900 {
     background-color: #1e293b !important;
     color: white !important;
     print-color-adjust: exact;
   }
+
   .text-emerald-400 {
     color: #10b981 !important;
   }
