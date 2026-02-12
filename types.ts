@@ -65,4 +65,4 @@ export interface FixedCost {
 }
 
 export type ViewType = 'dashboard' | 'suppliers' | 'products' | 'receipts' | 'sales' | 'categories' | 'reports' | 'boletos' | 'notas_lancadas' | 'manutencao' | 'custos_fixos';
-export type StoreUnit = 'loja1' | 'loja2';
+export type StoreUnit = 'samamabia' | 'aguas clara';
