@@ -1,5 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
+  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Cell, PieChart, Pie
+} from 'recharts';
+import {
   LayoutDashboard,
   Package,
   Plus,
@@ -111,6 +115,60 @@ const App: React.FC = () => {
 
   const totalFilteredReport = useMemo(() => filteredReceiptsForReport.reduce((acc, r) => acc + r.totalValue, 0), [filteredReceiptsForReport]);
 
+  // --- DATA PROCESSING FOR PREMIUM DASHBOARD ---
+
+  // 1. Histórico de Vendas (Últimos 30 dias)
+  const chartSalesData = useMemo(() => {
+    const data = [];
+    const now = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dayStr = d.toISOString().split('T')[0];
+      const daySales = dailySales.filter(s => s.date === dayStr).reduce((acc, s) => acc + s.totalValue, 0);
+      data.push({
+        name: d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+        value: daySales
+      });
+    }
+    return data;
+  }, [dailySales]);
+
+  // 2. Gastos por Categoria
+  const chartCategoryData = useMemo(() => {
+    const catMap: Record<string, number> = {};
+    receipts.forEach(r => {
+      const product = products.find(p => p.id === r.productId);
+      const cat = categories.find(c => c.id === product?.categoryId);
+      const catName = cat?.name || 'OUTROS';
+      catMap[catName] = (catMap[catName] || 0) + r.totalValue;
+    });
+    return Object.entries(catMap)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5);
+  }, [receipts, products, categories]);
+
+  // 3. Atividade Recente (Últimos 5 itens)
+  const recentActivity = useMemo(() => {
+    const activities = [
+      ...receipts.map(r => ({ type: 'receipt', date: r.date, val: r.totalValue, label: products.find(p => p.id === r.productId)?.name || 'Produto' })),
+      ...dailySales.map(s => ({ type: 'sale', date: s.date, val: s.totalValue, label: 'Fechamento de Caixa' }))
+    ];
+    return activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 5);
+  }, [receipts, dailySales, products]);
+
+  // 4. Próximos Vencimentos (7 dias)
+  const upcomingBillsDash = useMemo(() => {
+    const now = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(now.getDate() + 7);
+    return boletos
+      .filter(b => b.status === 'pending' && new Date(b.dueDate) <= nextWeek && new Date(b.dueDate) >= now)
+      .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
+      .slice(0, 3);
+  }, [boletos]);
+
   const [draftInvoiceHeader, setDraftInvoiceHeader] = useState({ supplierId: '', invoiceNumber: '', date: new Date().toISOString().split('T')[0] });
   const [draftItems, setDraftItems] = useState<{ productId: string, quantity: number, unitPrice: number }[]>([]);
   const [currentProductSearch, setCurrentProductSearch] = useState('');
@@ -164,8 +222,16 @@ const App: React.FC = () => {
 
       <main className="flex-1 p-4 pt-20 md:pt-12 md:p-12 overflow-y-auto max-w-7xl mx-auto w-full">
         {view === 'dashboard' && (
-          <div className="space-y-10 animate-in fade-in duration-500">
-            <header><h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Controle</h2></header>
+          <div className="space-y-10 animate-in fade-in duration-500 pb-20">
+            <header className="flex justify-between items-center">
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Controle</h2>
+              <div className="flex items-center gap-3">
+                <button onClick={() => setView('receipts')} className="p-4 bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-600/20 hover:scale-105 transition-all font-black text-xs uppercase flex items-center gap-2"><Plus size={16} /> Novo Lançamento</button>
+                <button onClick={() => setView('sales')} className="p-4 bg-slate-900 text-white rounded-2xl shadow-lg hover:scale-105 transition-all font-black text-xs uppercase flex items-center gap-2"><ShoppingCart size={16} /> Caixa</button>
+              </div>
+            </header>
+
+            {/* QUICK STATS */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm relative overflow-hidden group">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Compras no Mês</p>
@@ -186,6 +252,98 @@ const App: React.FC = () => {
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Faturamento (Mês)</p>
                 <p className="text-4xl font-black text-slate-900 mt-3">R$ {stats.totalSales.toLocaleString('pt-BR')}</p>
                 <ShoppingCart className="absolute right-6 top-6 text-slate-100" size={60} />
+              </div>
+            </div>
+
+            {/* CHARTS AND FEEDS */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+              {/* MAIN CHART */}
+              <div className="lg:col-span-2 space-y-8">
+                <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm">
+                  <div className="flex justify-between items-center mb-10">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Vendas (Últimos 30 dias)</h3>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full" /><span className="text-[10px] font-black uppercase text-slate-600">Faturamento Diário</span></div>
+                  </div>
+                  <div className="h-[300px] w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={chartSalesData}>
+                        <defs>
+                          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} dy={10} />
+                        <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} tickFormatter={(v) => `R$ ${v}`} />
+                        <Tooltip
+                          contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '16px', color: '#fff', fontWeight: 'bold' }}
+                          itemStyle={{ color: '#10b981' }}
+                        />
+                        <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-8">Gastos por Categoria</h3>
+                    <div className="h-[200px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartCategoryData} layout="vertical">
+                          <XAxis type="number" hide />
+                          <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: '#64748b' }} width={100} />
+                          <Tooltip
+                            cursor={{ fill: 'transparent' }}
+                            contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
+                          />
+                          <Bar dataKey="value" fill="#6366f1" radius={[0, 10, 10, 0]} barSize={20} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  <div className="bg-slate-900 p-10 rounded-[48px] text-white shadow-2xl relative overflow-hidden">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2"><AlertCircle size={16} /> Alertas Críticos</h3>
+                    <div className="space-y-4">
+                      {upcomingBillsDash.map(b => (
+                        <div key={b.id} className="p-4 bg-white/5 rounded-2xl border border-white/10 flex justify-between items-center group hover:bg-white/10 transition-all border-l-4 border-l-red-500">
+                          <div>
+                            <p className="text-xs font-black uppercase tracking-tight">{b.description}</p>
+                            <p className="text-[10px] font-bold text-red-400 mt-1">Vence: {new Date(b.dueDate).toLocaleDateString()}</p>
+                          </div>
+                          <p className="font-black text-white">R$ {b.value.toLocaleString('pt-BR')}</p>
+                        </div>
+                      ))}
+                      {upcomingBillsDash.length === 0 && <p className="text-slate-500 font-bold text-sm">Sem vencimentos próximos para hoje.</p>}
+                    </div>
+                    <BarChart3 className="absolute right-0 bottom-0 text-white/[0.03] -mb-10 -mr-10" size={200} />
+                  </div>
+                </div>
+              </div>
+
+              {/* SIDE FEED */}
+              <div className="space-y-8">
+                <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm h-full">
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-8 flex items-center gap-2"><History size={16} /> Atividade Recente</h3>
+                  <div className="space-y-6">
+                    {recentActivity.map((activity, i) => (
+                      <div key={i} className="flex gap-4 items-start relative pb-6 group">
+                        {i !== recentActivity.length - 1 && <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-slate-100 group-last:hidden" />}
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${activity.type === 'receipt' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                          {activity.type === 'receipt' ? <FileText size={12} /> : <TrendingUp size={12} />}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-xs font-black text-slate-800 leading-tight">{activity.label}</p>
+                          <p className="text-[10px] font-bold text-slate-400 flex items-center gap-2 uppercase">
+                            {new Date(activity.date).toLocaleDateString()} • <span className={activity.type === 'receipt' ? 'text-indigo-500' : 'text-emerald-500'}>R$ {activity.val.toLocaleString('pt-BR')}</span>
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button onClick={() => setView('reports')} className="w-full mt-6 py-4 border-2 border-slate-50 text-slate-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 hover:text-slate-600 transition-all">Ver Relatório Completo</button>
+                </div>
               </div>
             </div>
           </div>
