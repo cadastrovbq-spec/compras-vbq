@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   LayoutDashboard,
@@ -620,3 +619,146 @@ const App: React.FC = () => {
                           <td className="p-6 text-slate-500 text-sm">{s.notes || '—'}</td>
                           <td className="p-6 text-center"><button onClick={() => setDailySales(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
                         </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== MANUTENÇÃO ==================== */}
+        {view === 'manutencao' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header><h2 className="text-3xl font-black text-slate-800 tracking-tight">Manutenção</h2></header>
+
+            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8 no-print">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Lançar Manutenção</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <input id="maint-desc" type="text" placeholder="Descrição (ex: Conserto Geladeira)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <select id="maint-sup" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold text-slate-700 outline-none focus:border-emerald-500">
+                  <option value="">Prestador/Fornecedor...</option>
+                  {suppliers.sort((a, b) => a.name.localeCompare(b.name)).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                </select>
+                <input id="maint-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="maint-value" type="number" placeholder="Valor (R$)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+              </div>
+              <button onClick={() => {
+                const desc = (document.getElementById('maint-desc') as HTMLInputElement).value;
+                const sup = (document.getElementById('maint-sup') as HTMLSelectElement).value;
+                const date = (document.getElementById('maint-date') as HTMLInputElement).value;
+                const val = parseFloat((document.getElementById('maint-value') as HTMLInputElement).value);
+                if (!desc || !val || !date) return;
+                setMaintenanceRecords(prev => [{ id: Date.now().toString(), description: desc, supplierId: sup, date, value: val }, ...prev]);
+                (document.getElementById('maint-desc') as HTMLInputElement).value = '';
+                (document.getElementById('maint-value') as HTMLInputElement).value = '';
+              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Registrar Manutenção</button>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+              <div className="p-6 bg-slate-50 border-b"><p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Histórico de Manutenções</p></div>
+              <table className="w-full text-left min-w-[600px]">
+                <thead className="bg-slate-50/50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-6">Descrição</th><th className="p-6">Prestador</th><th className="p-6">Data</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Ação</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {maintenanceRecords.map(m => (
+                    <tr key={m.id} className="hover:bg-slate-50">
+                      <td className="p-6 font-black text-slate-700">{m.description}</td>
+                      <td className="p-6 text-slate-600">{suppliers.find(s => s.id === m.supplierId)?.name || '—'}</td>
+                      <td className="p-6 font-bold">{new Date(m.date).toLocaleDateString()}</td>
+                      <td className="p-6 text-right font-black text-emerald-600">R$ {m.value.toLocaleString('pt-BR')}</td>
+                      <td className="p-6 text-center"><button onClick={() => setMaintenanceRecords(prev => prev.filter(x => x.id !== m.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* NOTAS DO MÊS ATUAL */}
+            <div className="bg-slate-900 p-10 rounded-[48px] shadow-2xl text-white">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2"><FileText size={16} /> Notas com Vencimento no Mês Atual</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentMonthReceipts.map(r => (
+                  <div key={r.id} className="bg-white/10 p-6 rounded-3xl border border-white/5">
+                    <p className="font-black text-white">{products.find(p => p.id === r.productId)?.name}</p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">{suppliers.find(s => s.id === r.supplierId)?.name} • {new Date(r.date).toLocaleDateString()}</p>
+                    <p className="text-xl font-black text-emerald-400 mt-3">R$ {r.totalValue.toLocaleString('pt-BR')}</p>
+                  </div>
+                ))}
+                {currentMonthReceipts.length === 0 && <p className="text-slate-500 font-bold">Nenhuma nota para o mês atual.</p>}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ==================== CUSTOS FIXOS ==================== */}
+        {view === 'custos_fixos' && (
+          <div className="space-y-10 animate-in fade-in duration-500">
+            <header><h2 className="text-3xl font-black text-slate-800 tracking-tight">Custos Fixos</h2></header>
+
+            <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8 no-print">
+              <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Lançar Custo Fixo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <input id="fixed-desc" type="text" placeholder="Descrição (ex: Aluguel, Internet)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="fixed-value" type="number" placeholder="Valor (R$)" className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                <input id="fixed-due" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+              </div>
+              <button onClick={() => {
+                const desc = (document.getElementById('fixed-desc') as HTMLInputElement).value;
+                const val = parseFloat((document.getElementById('fixed-value') as HTMLInputElement).value);
+                const due = (document.getElementById('fixed-due') as HTMLInputElement).value;
+                if (!desc || !val || !due) return;
+                setFixedCosts(prev => [{ id: Date.now().toString(), description: desc, value: val, dueDate: due, status: 'pending' }, ...prev]);
+                (document.getElementById('fixed-desc') as HTMLInputElement).value = '';
+                (document.getElementById('fixed-value') as HTMLInputElement).value = '';
+              }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Lançar Custo</button>
+            </div>
+
+            <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+              <div className="p-6 bg-slate-50 border-b"><p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Controle de Custos</p></div>
+              <table className="w-full text-left min-w-[600px]">
+                <thead className="bg-slate-50/50 border-b text-[10px] font-black uppercase text-slate-400">
+                  <tr><th className="p-6">Descrição</th><th className="p-6">Vencimento</th><th className="p-6 text-right">Valor</th><th className="p-6 text-center">Status</th><th className="p-6 text-center">Ação</th></tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {fixedCosts.map(f => (
+                    <tr key={f.id} className="hover:bg-slate-50">
+                      <td className="p-6 font-black text-slate-700">{f.description}</td>
+                      <td className="p-6 font-bold">{new Date(f.dueDate).toLocaleDateString()}</td>
+                      <td className="p-6 text-right font-black text-emerald-600">R$ {f.value.toLocaleString('pt-BR')}</td>
+                      <td className="p-6 text-center">
+                        <button onClick={() => setFixedCosts(prev => prev.map(x => x.id === f.id ? { ...x, status: x.status === 'pending' ? 'paid' : 'pending' } : x))}
+                          className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${f.status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                          {f.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}
+                        </button>
+                      </td>
+                      <td className="p-6 text-center"><button onClick={() => setFixedCosts(prev => prev.filter(x => x.id !== f.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="bg-indigo-900 p-10 rounded-[48px] shadow-2xl text-white">
+              <h3 className="text-sm font-black uppercase tracking-widest text-white/50 mb-6 flex items-center gap-2"><FileText size={16} /> Notas com Vencimento no Mês Atual</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {currentMonthReceipts.map(r => (
+                  <div key={r.id} className="bg-white/10 p-6 rounded-3xl border border-white/5">
+                    <p className="font-black text-white">{products.find(p => p.id === r.productId)?.name}</p>
+                    <p className="text-[10px] font-bold text-white/40 uppercase mt-1">{suppliers.find(s => s.id === r.supplierId)?.name} • {new Date(r.date).toLocaleDateString()}</p>
+                    <p className="text-xl font-black text-emerald-400 mt-3">R$ {r.totalValue.toLocaleString('pt-BR')}</p>
+                  </div>
+                ))}
+                {currentMonthReceipts.length === 0 && <p className="text-indigo-400 font-bold">Nenhuma nota para o mês atual.</p>}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
+export default App;
