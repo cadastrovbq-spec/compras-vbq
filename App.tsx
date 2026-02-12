@@ -28,11 +28,30 @@ import {
   FilterX,
   Menu
 } from 'lucide-react';
-import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto, MaintenanceRecord, FixedCost } from './types';
+import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto, MaintenanceRecord, FixedCost, StoreUnit } from './types';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('dashboard');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeStore, setActiveStore] = useState<StoreUnit>(() => {
+    try { return localStorage.getItem('vbq_active_store') as StoreUnit || 'loja1'; } catch { return 'loja1'; }
+  });
+  const [restrictedMode, setRestrictedMode] = useState<boolean>(() => {
+    try { return localStorage.getItem('vbq_restricted_mode') === 'true'; } catch { return false; }
+  });
+
+  const toggleRestricted = () => {
+    if (restrictedMode) {
+      const pass = prompt('Digite a senha de administrador:');
+      if (pass === '20262') {
+        setRestrictedMode(false);
+      } else {
+        alert('Senha incorreta!');
+      }
+    } else {
+      setRestrictedMode(true);
+    }
+  };
 
   const loadFromLS = <T,>(key: string, defaultValue: T): T => {
     try {
@@ -59,19 +78,31 @@ const App: React.FC = () => {
   ].map((name, i) => ({ id: `s-${i}`, name, taxId: '', contact: '', vendorName: '', vendorPhone: '' }))));
 
   const [products, setProducts] = useState<Product[]>(() => loadFromLS('vbq_products', []));
-  const [receipts, setReceipts] = useState<Receipt[]>(() => loadFromLS('vbq_receipts', []));
-  const [dailySales, setDailySales] = useState<DailySale[]>(() => loadFromLS('vbq_sales', []));
-  const [boletos, setBoletos] = useState<Boleto[]>(() => loadFromLS('vbq_boletos', []));
-  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>(() => loadFromLS('vbq_maintenance', []));
-  const [fixedCosts, setFixedCosts] = useState<FixedCost[]>(() => loadFromLS('vbq_fixed_costs', []));
+  const [receipts, setReceipts] = useState<Receipt[]>(() => loadFromLS(`vbq_${activeStore}_receipts`, []));
+  const [dailySales, setDailySales] = useState<DailySale[]>(() => loadFromLS(`vbq_${activeStore}_sales`, []));
+  const [boletos, setBoletos] = useState<Boleto[]>(() => loadFromLS(`vbq_${activeStore}_boletos`, []));
+  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>(() => loadFromLS(`vbq_${activeStore}_maintenance`, []));
+  const [fixedCosts, setFixedCosts] = useState<FixedCost[]>(() => loadFromLS(`vbq_${activeStore}_fixed_costs`, []));
+
+  useEffect(() => { localStorage.setItem('vbq_active_store', activeStore); }, [activeStore]);
+  useEffect(() => { localStorage.setItem('vbq_restricted_mode', String(restrictedMode)); }, [restrictedMode]);
+
+  useEffect(() => {
+    // Re-carregar dados ao trocar de loja
+    setReceipts(loadFromLS(`vbq_${activeStore}_receipts`, []));
+    setDailySales(loadFromLS(`vbq_${activeStore}_sales`, []));
+    setBoletos(loadFromLS(`vbq_${activeStore}_boletos`, []));
+    setMaintenanceRecords(loadFromLS(`vbq_${activeStore}_maintenance`, []));
+    setFixedCosts(loadFromLS(`vbq_${activeStore}_fixed_costs`, []));
+  }, [activeStore]);
 
   useEffect(() => { localStorage.setItem('vbq_suppliers', JSON.stringify(suppliers)); }, [suppliers]);
   useEffect(() => { localStorage.setItem('vbq_products', JSON.stringify(products)); }, [products]);
-  useEffect(() => { localStorage.setItem('vbq_receipts', JSON.stringify(receipts)); }, [receipts]);
-  useEffect(() => { localStorage.setItem('vbq_sales', JSON.stringify(dailySales)); }, [dailySales]);
-  useEffect(() => { localStorage.setItem('vbq_boletos', JSON.stringify(boletos)); }, [boletos]);
-  useEffect(() => { localStorage.setItem('vbq_maintenance', JSON.stringify(maintenanceRecords)); }, [maintenanceRecords]);
-  useEffect(() => { localStorage.setItem('vbq_fixed_costs', JSON.stringify(fixedCosts)); }, [fixedCosts]);
+  useEffect(() => { localStorage.setItem(`vbq_${activeStore}_receipts`, JSON.stringify(receipts)); }, [receipts, activeStore]);
+  useEffect(() => { localStorage.setItem(`vbq_${activeStore}_sales`, JSON.stringify(dailySales)); }, [dailySales, activeStore]);
+  useEffect(() => { localStorage.setItem(`vbq_${activeStore}_boletos`, JSON.stringify(boletos)); }, [boletos, activeStore]);
+  useEffect(() => { localStorage.setItem(`vbq_${activeStore}_maintenance`, JSON.stringify(maintenanceRecords)); }, [maintenanceRecords, activeStore]);
+  useEffect(() => { localStorage.setItem(`vbq_${activeStore}_fixed_costs`, JSON.stringify(fixedCosts)); }, [fixedCosts, activeStore]);
 
   // Filtros de Análise
   const [reportFilterProduct, setReportFilterProduct] = useState('');
@@ -80,6 +111,12 @@ const App: React.FC = () => {
     const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0];
   });
   const [reportFilterEndDate, setReportFilterEndDate] = useState(new Date().toISOString().split('T')[0]);
+
+  useEffect(() => {
+    if (restrictedMode && (view === 'dashboard' || view === 'reports')) {
+      setView('receipts');
+    }
+  }, [restrictedMode, view]);
 
   // Dash Stats
   const stats = useMemo(() => {
@@ -181,7 +218,7 @@ const App: React.FC = () => {
       <div className="md:hidden fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white flex items-center justify-between px-5 py-3 shadow-xl no-print">
         <div className="flex items-center gap-3">
           <div className="p-1.5 bg-emerald-500 rounded-xl"><Package size={20} /></div>
-          <h1 className="text-base font-black tracking-tighter uppercase">COMPRAS VBQ</h1>
+          <h1 className="text-base font-black tracking-tighter uppercase">COMPRAS VBQ <span className="text-[10px] text-emerald-400 ml-1">({activeStore === 'loja1' ? 'L1' : 'L2'})</span></h1>
         </div>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-xl hover:bg-slate-800 transition-colors">
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -200,6 +237,17 @@ const App: React.FC = () => {
             <p className="text-[10px] font-bold text-slate-500 tracking-widest mt-1">VERCEL DEPLOY</p>
           </div>
         </div>
+        <div className="px-6 mb-4">
+          <div className="bg-slate-800 p-2 rounded-2xl flex gap-1">
+            <button onClick={() => setActiveStore('loja1')} className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${activeStore === 'loja1' ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:text-white'}`}>Loja 1</button>
+            <button onClick={() => setActiveStore('loja2')} className={`flex-1 py-2 rounded-xl text-[10px] font-black uppercase transition-all ${activeStore === 'loja2' ? 'bg-emerald-600 text-white' : 'text-slate-500 hover:text-white'}`}>Loja 2</button>
+          </div>
+          <button onClick={toggleRestricted} className={`w-full mt-3 p-3 rounded-xl border flex items-center justify-between transition-all ${restrictedMode ? 'border-red-500/50 bg-red-500/10 text-red-400' : 'border-slate-700 bg-slate-800/50 text-slate-500'}`}>
+            <span className="text-[9px] font-black uppercase tracking-wider">{restrictedMode ? '🔐 Modo Restrito Ativo' : '🔓 Modo Administrativo'}</span>
+            <div className={`w-2 h-2 rounded-full ${restrictedMode ? 'bg-red-500 animate-pulse' : 'bg-slate-600'}`} />
+          </button>
+        </div>
+
         <nav className="flex-1 px-5 space-y-1.5 pb-10 pt-16 md:pt-0">
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Painel Geral' },
@@ -212,7 +260,10 @@ const App: React.FC = () => {
             { id: 'reports', icon: BarChart3, label: 'Análise de Itens' },
             { id: 'manutencao', icon: History, label: 'Manutenção' },
             { id: 'custos_fixos', icon: Calculator, label: 'Custos Fixos' }
-          ].map(item => (
+          ].filter(item => {
+            if (restrictedMode && (item.id === 'dashboard' || item.id === 'reports')) return false;
+            return true;
+          }).map(item => (
             <button key={item.id} onClick={() => { setView(item.id as ViewType); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <item.icon size={20} /> {item.label}
             </button>
