@@ -48,11 +48,20 @@ export interface Boleto {
   categoryId: string;
 }
 
-export type ViewType = 'dashboard' | 'suppliers' | 'products' | 'receipts' | 'sales' | 'categories' | 'reports' | 'boletos' | 'notas_lancadas';
-
-export interface InventoryAnalysis {
-  summary: string;
-  priceWarnings: string[];
-  stockOpportunities: string[];
-  supplierPerformance: string[];
+export interface MaintenanceRecord {
+  id: string;
+  description: string;
+  supplierId: string;
+  date: string;
+  value: number;
 }
+
+export interface FixedCost {
+  id: string;
+  description: string;
+  value: number;
+  dueDate: string;
+  status: 'pending' | 'paid';
+}
+
+export type ViewType = 'dashboard' | 'suppliers' | 'products' | 'receipts' | 'sales' | 'categories' | 'reports' | 'boletos' | 'notas_lancadas' | 'manutencao' | 'custos_fixos';
