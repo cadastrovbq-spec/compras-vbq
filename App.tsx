@@ -25,7 +25,7 @@ import {
   FilterX,
   Menu
 } from 'lucide-react';
-import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto } from './types';
+import { Supplier, Product, Receipt, DailySale, Category, ViewType, Boleto, MaintenanceRecord, FixedCost } from './types';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewType>('dashboard');
@@ -59,12 +59,16 @@ const App: React.FC = () => {
   const [receipts, setReceipts] = useState<Receipt[]>(() => loadFromLS('vbq_receipts', []));
   const [dailySales, setDailySales] = useState<DailySale[]>(() => loadFromLS('vbq_sales', []));
   const [boletos, setBoletos] = useState<Boleto[]>(() => loadFromLS('vbq_boletos', []));
+  const [maintenanceRecords, setMaintenanceRecords] = useState<MaintenanceRecord[]>(() => loadFromLS('vbq_maintenance', []));
+  const [fixedCosts, setFixedCosts] = useState<FixedCost[]>(() => loadFromLS('vbq_fixed_costs', []));
 
   useEffect(() => { localStorage.setItem('vbq_suppliers', JSON.stringify(suppliers)); }, [suppliers]);
   useEffect(() => { localStorage.setItem('vbq_products', JSON.stringify(products)); }, [products]);
   useEffect(() => { localStorage.setItem('vbq_receipts', JSON.stringify(receipts)); }, [receipts]);
   useEffect(() => { localStorage.setItem('vbq_sales', JSON.stringify(dailySales)); }, [dailySales]);
   useEffect(() => { localStorage.setItem('vbq_boletos', JSON.stringify(boletos)); }, [boletos]);
+  useEffect(() => { localStorage.setItem('vbq_maintenance', JSON.stringify(maintenanceRecords)); }, [maintenanceRecords]);
+  useEffect(() => { localStorage.setItem('vbq_fixed_costs', JSON.stringify(fixedCosts)); }, [fixedCosts]);
 
   // Filtros de Análise
   const [reportFilterProduct, setReportFilterProduct] = useState('');
@@ -85,6 +89,14 @@ const App: React.FC = () => {
     const nextMonthDebt = boletos.filter(b => b.status === 'pending').reduce((acc, b) => acc + b.value, 0);
     return { totalPurchases, totalSales, cmvPercent, nextMonthDebt };
   }, [receipts, boletos, dailySales]);
+
+  const currentMonthReceipts = useMemo(() => {
+    const now = new Date();
+    return receipts.filter(r => {
+      const d = new Date(r.date);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+  }, [receipts]);
 
   // Filtragem Dinâmica
   const filteredReceiptsForReport = useMemo(() => {
@@ -140,7 +152,9 @@ const App: React.FC = () => {
             { id: 'products', icon: Box, label: 'Produtos' },
             { id: 'suppliers', icon: Users, label: 'Fornecedores' },
             { id: 'sales', icon: ShoppingCart, label: 'Caixa do Dia' },
-            { id: 'reports', icon: BarChart3, label: 'Análise de Itens' }
+            { id: 'reports', icon: BarChart3, label: 'Análise de Itens' },
+            { id: 'manutencao', icon: History, label: 'Manutenção' },
+            { id: 'custos_fixos', icon: Calculator, label: 'Custos Fixos' }
           ].map(item => (
             <button key={item.id} onClick={() => { setView(item.id as ViewType); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <item.icon size={20} /> {item.label}
@@ -606,17 +620,3 @@ const App: React.FC = () => {
                           <td className="p-6 text-slate-500 text-sm">{s.notes || '—'}</td>
                           <td className="p-6 text-center"><button onClick={() => setDailySales(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-    </div>
-  );
-};
-
-export default App;
