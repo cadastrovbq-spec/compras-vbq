@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -76,6 +77,17 @@ const App: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>(() => loadFromLS('vbq_suppliers', [
     "AJES", "ALVES", "AMBEV", "BMG FOODS", "BRASAL", "BRILHO INOX", "CANAL", "CARAMUJO", "CARVÃO TROPICAL", "CIDADE", "DAMASCO", "DE MARCHI", "DEL MAIPO", "DELLY'S", "ELÉTRICA BURITI", "EUROBRAS", "FRIPREMIUM", "GARDA", "GELO TOP", "GERMANA", "GOTA GAS", "HP ELÉTRICA", "JC DISTRIBUIÇÃO", "LGA", "LENI ALVES", "LOJA DO AÇOUGUEIRO", "MACHADO", "MANDIOCA AMARELA", "MR CARNES", "NACIONAL GRÁFICA", "POTIGUAR SALGADOS", "RESTAURANTEIRO", "REFRIUS", "RSANTOS", "S.O.S. DESENTUPIDORA", "SEVEN", "SORVE MILK", "SOLLI ATACADISTA", "SUPER GAS BRAS", "SWEET", "TOTAL SERV", "WESLEY", "WL"
   ].map((name, i) => ({ id: `s-${i}`, name, taxId: '', contact: '', vendorName: '', vendorPhone: '' }))));
+
+  const theme = {
+    primary: activeStore === 'loja1' ? 'emerald' : 'blue',
+    hex: activeStore === 'loja1' ? '#10b981' : '#3b82f6',
+    bg: activeStore === 'loja1' ? 'bg-emerald-600' : 'bg-blue-600',
+    bgLight: activeStore === 'loja1' ? 'bg-emerald-500' : 'bg-blue-500',
+    text: activeStore === 'loja1' ? 'text-emerald-600' : 'text-blue-600',
+    textLight: activeStore === 'loja1' ? 'text-emerald-400' : 'text-blue-400',
+    shadow: activeStore === 'loja1' ? 'shadow-emerald-600/20' : 'shadow-blue-600/20',
+    border: activeStore === 'loja1' ? 'focus:border-emerald-500' : 'focus:border-blue-500'
+  };
 
   const [products, setProducts] = useState<Product[]>(() => loadFromLS('vbq_products', []));
   const [receipts, setReceipts] = useState<Receipt[]>(() => loadFromLS(`vbq_${activeStore}_receipts`, []));
@@ -217,8 +229,8 @@ const App: React.FC = () => {
       {/* MOBILE HEADER */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-[60] bg-slate-900 text-white flex items-center justify-between px-5 py-3 shadow-xl no-print">
         <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-emerald-500 rounded-xl"><Package size={20} /></div>
-          <h1 className="text-base font-black tracking-tighter uppercase">COMPRAS VBQ <span className="text-[10px] text-emerald-400 ml-1">({activeStore === 'loja1' ? 'L1' : 'L2'})</span></h1>
+          <div className={`p-1.5 ${theme.bgLight} rounded-xl`}><Package size={20} /></div>
+          <h1 className="text-base font-black tracking-tighter uppercase">COMPRAS VBQ <span className={`text-[10px] ${theme.textLight} ml-1`}>({activeStore === 'loja1' ? 'L1' : 'L2'})</span></h1>
         </div>
         <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 rounded-xl hover:bg-slate-800 transition-colors">
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -231,7 +243,7 @@ const App: React.FC = () => {
       {/* SIDEBAR */}
       <aside className={`fixed md:sticky top-0 left-0 h-screen z-[58] w-72 bg-slate-900 text-white flex flex-col shadow-2xl overflow-y-auto no-print transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div className="p-10 flex items-center gap-3 hidden md:flex">
-          <div className="p-2.5 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/20"><Package size={28} /></div>
+          <div className={`p-2.5 ${theme.bgLight} rounded-2xl shadow-lg ${theme.shadow.replace('600', '500')}`}><Package size={28} /></div>
           <div>
             <h1 className="text-xl font-black tracking-tighter uppercase leading-none">COMPRAS VBQ</h1>
             <p className="text-[10px] font-bold text-slate-500 tracking-widest mt-1">VERCEL DEPLOY</p>
@@ -264,7 +276,7 @@ const App: React.FC = () => {
             if (restrictedMode && (item.id === 'dashboard' || item.id === 'reports')) return false;
             return true;
           }).map(item => (
-            <button key={item.id} onClick={() => { setView(item.id as ViewType); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? 'bg-emerald-600 text-white shadow-xl shadow-emerald-600/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
+            <button key={item.id} onClick={() => { setView(item.id as ViewType); setMobileMenuOpen(false); }} className={`w-full flex items-center gap-3.5 px-5 py-4 rounded-2xl transition-all font-semibold ${view === item.id ? `${theme.bg} text-white shadow-xl ${theme.shadow}` : 'text-slate-400 hover:bg-slate-800 hover:text-white'}`}>
               <item.icon size={20} /> {item.label}
             </button>
           ))}
@@ -275,9 +287,9 @@ const App: React.FC = () => {
         {view === 'dashboard' && (
           <div className="space-y-10 animate-in fade-in duration-500 pb-20">
             <header className="flex justify-between items-center">
-              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Controle</h2>
+              <h2 className="text-3xl font-black text-slate-800 tracking-tight">Painel de Controle <span className={theme.textLight}>({activeStore === 'loja1' ? 'Loja 1' : 'Loja 2'})</span></h2>
               <div className="flex items-center gap-3">
-                <button onClick={() => setView('receipts')} className="p-4 bg-emerald-600 text-white rounded-2xl shadow-lg shadow-emerald-600/20 hover:scale-105 transition-all font-black text-xs uppercase flex items-center gap-2"><Plus size={16} /> Novo Lançamento</button>
+                <button onClick={() => setView('receipts')} className={`p-4 ${theme.bg} text-white rounded-2xl shadow-lg ${theme.shadow} hover:scale-105 transition-all font-black text-xs uppercase flex items-center gap-2`}><Plus size={16} /> Novo Lançamento</button>
                 <button onClick={() => setView('sales')} className="p-4 bg-slate-900 text-white rounded-2xl shadow-lg hover:scale-105 transition-all font-black text-xs uppercase flex items-center gap-2"><ShoppingCart size={16} /> Caixa</button>
               </div>
             </header>
@@ -286,7 +298,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               <div className="bg-white p-8 rounded-[40px] border border-slate-200 shadow-sm relative overflow-hidden group">
                 <p className="text-[11px] font-bold text-slate-400 uppercase tracking-[0.2em]">Compras no Mês</p>
-                <p className="text-4xl font-black text-slate-900 mt-3 group-hover:text-emerald-600 transition-colors">R$ {stats.totalPurchases.toLocaleString('pt-BR')}</p>
+                <p className={`text-4xl font-black text-slate-900 mt-3 group-hover:${theme.text} transition-colors`}>R$ {stats.totalPurchases.toLocaleString('pt-BR')}</p>
                 <TrendingUp className="absolute right-6 top-6 text-slate-100" size={60} />
               </div>
               <div className="bg-indigo-900 p-8 rounded-[40px] shadow-2xl relative text-white overflow-hidden group">
@@ -313,15 +325,15 @@ const App: React.FC = () => {
                 <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-sm">
                   <div className="flex justify-between items-center mb-10">
                     <h3 className="text-sm font-black uppercase tracking-widest text-slate-400">Vendas (Últimos 30 dias)</h3>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 bg-emerald-500 rounded-full" /><span className="text-[10px] font-black uppercase text-slate-600">Faturamento Diário</span></div>
+                    <div className="flex items-center gap-2"><div className={`w-3 h-3 ${theme.bgLight} rounded-full`} /><span className="text-[10px] font-black uppercase text-slate-600">Faturamento Diário</span></div>
                   </div>
                   <div className="h-[300px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={chartSalesData}>
                         <defs>
                           <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                            <stop offset="5%" stopColor={theme.hex} stopOpacity={0.3} />
+                            <stop offset="95%" stopColor={theme.hex} stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -329,9 +341,9 @@ const App: React.FC = () => {
                         <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 900, fill: '#94a3b8' }} tickFormatter={(v) => `R$ ${v}`} />
                         <Tooltip
                           contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '16px', color: '#fff', fontWeight: 'bold' }}
-                          itemStyle={{ color: '#10b981' }}
+                          itemStyle={{ color: theme.hex }}
                         />
-                        <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
+                        <Area type="monotone" dataKey="value" stroke={theme.hex} strokeWidth={4} fillOpacity={1} fill="url(#colorValue)" />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -349,7 +361,7 @@ const App: React.FC = () => {
                             cursor={{ fill: 'transparent' }}
                             contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px', color: '#fff' }}
                           />
-                          <Bar dataKey="value" fill="#6366f1" radius={[0, 10, 10, 0]} barSize={20} />
+                          <Bar dataKey="value" fill={activeStore === 'loja1' ? '#10b981' : '#6366f1'} radius={[0, 10, 10, 0]} barSize={20} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
@@ -381,13 +393,13 @@ const App: React.FC = () => {
                     {recentActivity.map((activity, i) => (
                       <div key={i} className="flex gap-4 items-start relative pb-6 group">
                         {i !== recentActivity.length - 1 && <div className="absolute left-[11px] top-6 bottom-0 w-[2px] bg-slate-100 group-last:hidden" />}
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${activity.type === 'receipt' ? 'bg-indigo-100 text-indigo-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 z-10 ${activity.type === 'receipt' ? 'bg-indigo-100 text-indigo-600' : `${theme.bg.replace('bg-', 'bg-opacity-10 bg-')} ${theme.text}`}`}>
                           {activity.type === 'receipt' ? <FileText size={12} /> : <TrendingUp size={12} />}
                         </div>
                         <div className="space-y-1">
                           <p className="text-xs font-black text-slate-800 leading-tight">{activity.label}</p>
                           <p className="text-[10px] font-bold text-slate-400 flex items-center gap-2 uppercase">
-                            {new Date(activity.date).toLocaleDateString()} • <span className={activity.type === 'receipt' ? 'text-indigo-500' : 'text-emerald-500'}>R$ {activity.val.toLocaleString('pt-BR')}</span>
+                            {new Date(activity.date).toLocaleDateString()} • <span className={activity.type === 'receipt' ? 'text-indigo-500' : theme.text}>R$ {activity.val.toLocaleString('pt-BR')}</span>
                           </p>
                         </div>
                       </div>
@@ -778,22 +790,22 @@ const App: React.FC = () => {
             <header className="flex justify-between items-center">
               <h2 className="text-3xl font-black text-slate-800 tracking-tight">Caixa do Dia</h2>
             </header>
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <div className="lg:col-span-5 space-y-10">
+            <div className={`grid grid-cols-1 ${restrictedMode ? '' : 'lg:grid-cols-12'} gap-10`}>
+              <div className={`${restrictedMode ? 'max-w-2xl mx-auto w-full' : 'lg:col-span-5'} space-y-10`}>
                 <div className="bg-white p-10 rounded-[48px] border border-slate-200 shadow-xl space-y-8">
                   <h3 className="text-sm font-black uppercase tracking-widest text-slate-400 flex items-center gap-2"><Plus size={16} /> Registrar Venda do Dia</h3>
                   <div className="space-y-6">
                     <div className="space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Data</label>
-                      <input id="sale-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                      <input id="sale-date" type="date" defaultValue={new Date().toISOString().split('T')[0]} className={`w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none ${theme.border}`} />
                     </div>
                     <div className="space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Valor Total do Dia (R$)</label>
-                      <input id="sale-value" type="number" placeholder="0,00" className="w-full p-5 bg-emerald-50 border-2 border-transparent rounded-[28px] font-black text-3xl text-center outline-none focus:border-emerald-500" />
+                      <input id="sale-value" type="number" placeholder="0,00" className={`w-full p-5 bg-${theme.primary}-50 border-2 border-transparent rounded-[28px] font-black text-3xl text-center outline-none ${theme.border}`} />
                     </div>
                     <div className="space-y-3">
                       <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest ml-1">Observações</label>
-                      <input id="sale-notes" type="text" placeholder="Ex: Dia fraco, choveu..." className="w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none focus:border-emerald-500" />
+                      <input id="sale-notes" type="text" placeholder="Ex: Dia fraco, choveu..." className={`w-full p-5 bg-slate-50 border-2 border-transparent rounded-[28px] font-bold outline-none ${theme.border}`} />
                     </div>
                   </div>
                   <button onClick={() => {
@@ -804,35 +816,40 @@ const App: React.FC = () => {
                     setDailySales(prev => [{ id: Date.now().toString(), totalValue: val, date, notes }, ...prev]);
                     (document.getElementById('sale-value') as HTMLInputElement).value = '';
                     (document.getElementById('sale-notes') as HTMLInputElement).value = '';
-                  }} className="w-full py-5 bg-emerald-600 text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:bg-emerald-700 transition-all">Registrar Caixa</button>
+                    alert('Caixa registrado com sucesso!');
+                  }} className={`w-full py-5 ${theme.bg} text-white rounded-[28px] font-black uppercase tracking-widest shadow-lg hover:${theme.bgLight.replace('bg-', 'bg-')} transition-all`}>Registrar Caixa</button>
                 </div>
 
-                <div className="bg-indigo-900 p-10 rounded-[48px] shadow-2xl text-white">
-                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Faturamento do Mês</p>
-                  <p className="text-5xl font-black text-emerald-400 mt-3">R$ {dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).reduce((a, s) => a + s.totalValue, 0).toLocaleString('pt-BR')}</p>
-                  <span className="inline-block mt-6 px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase">{dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).length} dias registrados</span>
-                </div>
+                {!restrictedMode && (
+                  <div className="bg-indigo-900 p-10 rounded-[48px] shadow-2xl text-white">
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/50">Faturamento do Mês</p>
+                    <p className={`text-5xl font-black ${theme.textLight} mt-3`}>R$ {dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).reduce((a, s) => a + s.totalValue, 0).toLocaleString('pt-BR')}</p>
+                    <span className="inline-block mt-6 px-3 py-1 bg-white/10 rounded-lg text-[10px] font-black uppercase">{dailySales.filter(s => new Date(s.date).getMonth() === new Date().getMonth()).length} dias registrados</span>
+                  </div>
+                )}
               </div>
 
-              <div className="lg:col-span-7">
-                <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
-                  <table className="w-full text-left min-w-[500px]">
-                    <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
-                      <tr><th className="p-6">Data</th><th className="p-6 text-right">Valor</th><th className="p-6">Obs</th><th className="p-6 text-center">Ação</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {dailySales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(s => (
-                        <tr key={s.id} className="hover:bg-slate-50">
-                          <td className="p-6 font-bold">{new Date(s.date).toLocaleDateString()}</td>
-                          <td className="p-6 text-right font-black text-emerald-600">R$ {s.totalValue.toLocaleString('pt-BR')}</td>
-                          <td className="p-6 text-slate-500 text-sm">{s.notes || '—'}</td>
-                          <td className="p-6 text-center"><button onClick={() => setDailySales(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+              {!restrictedMode && (
+                <div className="lg:col-span-7">
+                  <div className="bg-white rounded-[40px] border border-slate-200 overflow-hidden shadow-sm overflow-x-auto">
+                    <table className="w-full text-left min-w-[500px]">
+                      <thead className="bg-slate-50 border-b text-[10px] font-black uppercase text-slate-400">
+                        <tr><th className="p-6">Data</th><th className="p-6 text-right">Valor</th><th className="p-6">Obs</th><th className="p-6 text-center">Ação</th></tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {dailySales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).map(s => (
+                          <tr key={s.id} className="hover:bg-slate-50">
+                            <td className="p-6 font-bold">{new Date(s.date).toLocaleDateString()}</td>
+                            <td className={`p-6 text-right font-black ${theme.text}`}>R$ {s.totalValue.toLocaleString('pt-BR')}</td>
+                            <td className="p-6 text-slate-500 text-sm">{s.notes || '—'}</td>
+                            <td className="p-6 text-center"><button onClick={() => setDailySales(prev => prev.filter(x => x.id !== s.id))} className="text-red-400 hover:text-red-600 transition-colors"><Trash2 size={16} /></button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         )}
